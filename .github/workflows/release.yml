@@ -1,0 +1,83 @@
+name: BookSoul Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BookSoul_Main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: booksoul-apk
+          path: BookSoul_Main/build/app/outputs/flutter-apk/app-release.apk
+
+  dashboard-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BookSoul_Dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web --release --dart-define=SUPABASE_URL=https://example.supabase.co --dart-define=SUPABASE_ANON_KEY=public_ci_key
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-web
+          path: BookSoul_Dashboard/build/web
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: BookSoul_Main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: stable
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: booksoul-windows
+          path: BookSoul_Main/build/windows/x64/runner/Release
+
+  publish:
+    needs: [android, dashboard-web, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
+          files: |
+            booksoul-apk/app-release.apk
+            dashboard-web/**
+            booksoul-windows/**

@@ -1,0 +1,30 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+        CONTROL_PLANE_URL: ${CONTROL_PLANE_URL}
+    ports:
+      - "${DASHBOARD_PORT:-8088}:80"
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    restart: unless-stopped
+
+  control-plane:
+    build:
+      context: ./control-plane
+      dockerfile: Dockerfile
+    environment:
+      PORT: 8080
+      CONTROL_PLANE_TOKEN: ${CONTROL_PLANE_TOKEN}
+      DASHBOARD_ORIGIN: ${DASHBOARD_ORIGIN:-http://localhost:8088}
+      SUPABASE_URL: ${SUPABASE_URL}
+      MCP_SERVER_URL: ${MCP_SERVER_URL:-}
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-}
+    expose:
+      - "8080"
+    restart: unless-stopped

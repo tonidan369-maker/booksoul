@@ -1,0 +1,22 @@
+name: booksoul_dashboard
+description: لوحة إدارة BookSoul لسطح مكتب Windows.
+publish_to: "none"
+version: 1.4.0+4
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  supabase_flutter: ^2.8.4
+  google_fonts: ^6.2.1
+  intl: ^0.19.0
+  fl_chart: ^0.69.2
+  http: ^1.2.2
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+flutter:
+  uses-material-design: true

@@ -1,0 +1,10 @@
+# Generated release assets are attached to GitHub Releases, not tracked as source.
+artifacts/dashboard-web-release/
+releases/*.apk
+
+# Generated local state
+**/.dart_tool/
+**/build/
+**/node_modules/
+**/.env
+**/.env.*
